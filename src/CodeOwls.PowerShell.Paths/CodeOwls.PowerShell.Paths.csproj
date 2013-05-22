@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ED0453C7-C25A-4354-AC7A-046846D5E7FF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodeOwls.PowerShell.Paths</RootNamespace>
+    <AssemblyName>CodeOwls.PowerShell.Paths</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\WindowsPowerShell\v1.0\System.Management.Automation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CodeOwls.AssemblyInfo.cs">
+      <Link>Properties\CodeOwls.AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeOwls.PowerShell.AssemblyInfo.cs">
+      <Link>Properties\CodeOwls.PowerShell.AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Attributes\CmdletHelpPathIDAttribute.cs" />
+    <Compile Include="Exceptions\CopyOrMoveItemInternalException.cs" />
+    <Compile Include="Exceptions\CopyOrMoveToDifferentContainerTypeException.cs" />
+    <Compile Include="Exceptions\CopyOrMoveToExistingItemException.cs" />
+    <Compile Include="Exceptions\CopyOrMoveToNonexistentContainerException.cs" />
+    <Compile Include="Exceptions\MamlHelpDocumentExistsButCannotBeLoadedException.cs" />
+    <Compile Include="Exceptions\NodeDoesNotSupportCmdletException.cs" />
+    <Compile Include="Exceptions\ProviderException.cs" />
+    <Compile Include="Extensions\PathStringExtensions.cs" />
+    <Compile Include="IClearItemContent.cs" />
+    <Compile Include="IGetItemContent.cs" />
+    <Compile Include="ISetItemContent.cs" />
+    <Compile Include="Processors\Context.cs" />
+    <Compile Include="Processors\IContext.cs" />
+    <Compile Include="Processors\IPathNodeProcessor.cs" />
+    <Compile Include="IClearItem.cs" />
+    <Compile Include="ICopyItem.cs" />
+    <Compile Include="IInvokeItem.cs" />
+    <Compile Include="INewItem.cs" />
+    <Compile Include="INodeFactory.cs" />
+    <Compile Include="IPathNode.cs" />
+    <Compile Include="IRemoveItem.cs" />
+    <Compile Include="IRenameItem.cs" />
+    <Compile Include="ISetItem.cs" />
+    <Compile Include="NodeFactoryBase.cs" />
+    <Compile Include="PathNode.cs" />
+    <Compile Include="Processors\PathNodeProcessorBase.cs" />
+    <Compile Include="Processors\PathNodeProcessorDecorator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

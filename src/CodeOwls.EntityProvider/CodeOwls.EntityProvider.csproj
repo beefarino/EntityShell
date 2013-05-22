@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{11490DE9-1206-45F5-8462-992B274EAB80}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodeOwls.EntityProvider</RootNamespace>
+    <AssemblyName>CodeOwls.EntityProvider</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35\System.Management.Automation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Adapters\DataReaderAdapter.cs" />
+    <Compile Include="Adapters\NewItemEntityRuntimeParameterAdapter.cs" />
+    <Compile Include="Attributes\EntityDriveFromPathArgumentTransformAttribute.cs" />
+    <Compile Include="Cmdlets\CommitUnitOfWorkCmdlet.cs" />
+    <Compile Include="Cmdlets\InvalidUnitOfWorkContextException.cs" />
+    <Compile Include="Cmdlets\InvokeUnitOfWorkCmdlet.cs" />
+    <Compile Include="Cmdlets\Nouns.cs" />
+    <Compile Include="Cmdlets\RollbackUnitOfWorkCmdlet.cs" />
+    <Compile Include="Cmdlets\SaveDynamicTypesCmdlet.cs" />
+    <Compile Include="Cmdlets\StartUnitOfWorkCmdlet.cs" />
+    <Compile Include="Cmdlets\UnitOfWorkCmdlet.cs" />
+    <Compile Include="EntityContainerNodeFactory.cs" />
+    <Compile Include="EntityContextDrive.cs" />
+    <Compile Include="EntityDrive.cs" />
+    <Compile Include="EntityNodeFactory.cs" />
+    <Compile Include="EntityProvider.cs" />
+    <Compile Include="PathNodeProcessor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RootNodeFactory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodeOwls.PowerShell.Paths\CodeOwls.PowerShell.Paths.csproj">
+      <Project>{ed0453c7-c25a-4354-ac7a-046846d5e7ff}</Project>
+      <Name>CodeOwls.PowerShell.Paths</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeOwls.PowerShell.Provider\CodeOwls.PowerShell.Provider.csproj">
+      <Project>{b352375b-7c58-4943-95c0-14871e17a208}</Project>
+      <Name>CodeOwls.PowerShell.Provider</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
