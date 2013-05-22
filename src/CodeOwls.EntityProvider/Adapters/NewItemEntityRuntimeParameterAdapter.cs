@@ -83,7 +83,7 @@ namespace CodeOwls.EntityProvider.Adapters
                         DefineCopyItemAdapterMethod<T>(typeBuilder, fieldBuilder, entityMetadata);
                         parameterType = typeBuilder.CreateType();
                     }
-                    catch (Exception e)
+                    catch
                     {
                         parameterType = _assemblyBuilder.GetType(typename, false);
                     }

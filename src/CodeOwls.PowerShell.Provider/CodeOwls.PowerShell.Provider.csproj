@@ -32,10 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PostSharp, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\lib\PostSharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -54,15 +50,11 @@
     <Compile Include="..\CodeOwls.PowerShell.AssemblyInfo.cs">
       <Link>Properties\CodeOwls.PowerShell.AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Attributes\LogProviderToSession.cs" />
-    <Compile Include="Attributes\ManagePSTransactionAttribute.cs" />
     <Compile Include="Drive.cs" />
-    <Compile Include="Attributes\ManageSessionAttribute.cs" />
+    <Compile Include="LogToSessionProviderDecorator.cs" />
     <Compile Include="NullDisposable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider.cs" />
-    <Compile Include="ProviderWithDisposableSession.cs" />
-    <Compile Include="ProviderWithTransactions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodeOwls.PowerShell.Paths\CodeOwls.PowerShell.Paths.csproj">
