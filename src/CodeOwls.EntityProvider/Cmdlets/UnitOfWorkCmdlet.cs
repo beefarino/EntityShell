@@ -17,7 +17,7 @@ namespace CodeOwls.EntityProvider.Cmdlets
         protected bool AssertValidContext(string errorId, object target)
         {
             
-            Context = Context ?? EntityDriveFromPathArgumentTransformAttribute.GetEntityDriveFromPSPath(this.SessionState.Path, ".");
+            Context = Context ?? MetadataHelpers.GetEntityDriveFromPSPath(this.SessionState.Path, ".");
             if (null != Context)
             {
                 return true;

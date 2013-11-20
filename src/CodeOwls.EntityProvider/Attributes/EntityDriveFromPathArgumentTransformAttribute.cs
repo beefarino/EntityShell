@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CodeOwls.EntityProvider.Attributes
 {
-    [AttributeUsage( AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class EntityDriveFromPathArgumentTransformAttribute : ArgumentTransformationAttribute
     {
         public override object Transform(EngineIntrinsics engineIntrinsics, object inputData)
@@ -20,11 +20,13 @@ namespace CodeOwls.EntityProvider.Attributes
 
             var path = inputData.ToString();
 
-            var drive = GetEntityDriveFromPSPath(engineIntrinsics.SessionState.Path, path);
+            var drive = MetadataHelpers.GetEntityDriveFromPSPath(engineIntrinsics.SessionState.Path, path);
 
             return drive;
         }
-
+    }
+    static class MetadataHelpers
+    {
         public static EntityDrive GetEntityDriveFromPSPath(PathIntrinsics pathIntrinsics, string path)
         {
             var paths = pathIntrinsics.GetResolvedPSPathFromPSPath(path);
@@ -73,5 +75,24 @@ namespace CodeOwls.EntityProvider.Attributes
             return type;
         }
 
+    }
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class ValidateEntityStateAttribute : ValidateArgumentsAttribute
+    {
+        protected override void Validate(object arguments, EngineIntrinsics engineIntrinsics)
+        {
+
+            var o = arguments as PSObject;
+            if (null == o)
+            {
+                return;
+            }
+            var stateProperty = o.Properties["EntityState"];
+            if (null != stateProperty && StringComparer.InvariantCultureIgnoreCase.Equals("detatched",(string) stateProperty.Value))
+            {
+                throw new ValidationMetadataException("The specified entity is in a detatched state and is unusable for the specified operation.");
+            }
+        }
     }
 }

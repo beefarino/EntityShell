@@ -1,23 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Data.Metadata.Edm;
 using System.Globalization;
 using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using CodeOwls.EntityProvider.Attributes;
+using PropertyAttributes = System.Reflection.PropertyAttributes;
 
 namespace CodeOwls.EntityProvider.Adapters
 {
     public interface IEntityAdapter<T>
     {
         T ToEntity();
-        T ToNewEntity();
+        T ToNewEntity(DbContext context);
         void CopyTo(T entity);
     }
 
+    [Serializable]
+    public class EntityStateValidationException : Exception
+    {
+        //
+        // For guidelines regarding the creation of new exception types, see
+        //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconerrorraisinghandlingguidelines.asp
+        // and
+        //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dncscol/html/csharp07192001.asp
+        //
+
+        public EntityStateValidationException()
+        {
+        }
+
+        public EntityStateValidationException(string message) : base(message)
+        {
+        }
+
+        public EntityStateValidationException(string message, Exception inner) : base(message, inner)
+        {
+        }
+
+        protected EntityStateValidationException(
+            SerializationInfo info,
+            StreamingContext context) : base(info, context)
+        {
+        }
+    }
     class EntityRuntimeParameterAdapter
     {
         private static AssemblyBuilder _assemblyBuilder;
@@ -156,7 +190,7 @@ namespace CodeOwls.EntityProvider.Adapters
         void DefineNewItemAdapterMethod<T>(TypeBuilder typeBuilder, FieldBuilder fieldBuilder)
         {
 
-            var method = typeBuilder.DefineMethod("ToNewEntity", MethodAttributes.Public | MethodAttributes.Virtual, typeof(T), Type.EmptyTypes);
+            var method = typeBuilder.DefineMethod("ToNewEntity", MethodAttributes.Public | MethodAttributes.Virtual, typeof(T), new[]{typeof(DbContext)});
             var generator = method.GetILGenerator();
 
             var ctor = typeof(T).GetConstructor(Type.EmptyTypes);
@@ -172,11 +206,62 @@ namespace CodeOwls.EntityProvider.Adapters
 
             foreach (var propertyInfo in properties)
             {
+                DefineVerifyEntityStateIL(generator, entityCopy, propertyInfo, fieldBuilder);
+            }
+            foreach (var propertyInfo in properties)
+            {
                 DefineCopyPropertyIL(generator, entityCopy, propertyInfo, fieldBuilder);
             }
-
             generator.Emit(OpCodes.Ldloc, entityCopy.LocalIndex);
             generator.Emit(OpCodes.Ret);
+        }
+
+        private void DefineVerifyEntityStateIL(ILGenerator generator, LocalBuilder entityCopy, PropertyInfo propertyInfo, FieldBuilder fieldBuilder)
+        {       
+            var contextType = typeof (DbContext);
+            var entityEntryType = typeof (DbEntityEntry);
+            var entityStateType = typeof (EntityState);
+            var label = generator.DefineLabel();
+            
+            var methodInfo = contextType.GetMethod("Entry", BindingFlags.Instance | BindingFlags.Public, null, new[]{typeof(object)}, null);
+            var localState = generator.DeclareLocal(entityStateType);
+            var localValue = generator.DeclareLocal(propertyInfo.PropertyType);
+
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Ldfld, fieldBuilder);
+            generator.Emit(OpCodes.Call, propertyInfo.GetGetMethod());
+            generator.Emit(OpCodes.Stloc, localValue);
+
+            generator.Emit(OpCodes.Ldnull);
+            generator.Emit(OpCodes.Ldloc, localValue);    
+            generator.Emit(OpCodes.Ceq);
+            generator.Emit(OpCodes.Brtrue, label);
+
+            generator.BeginExceptionBlock();
+                generator.Emit(OpCodes.Ldarg_1);
+                generator.Emit(OpCodes.Ldloc, localValue);    
+                generator.Emit(OpCodes.Call, methodInfo);
+            
+                var stateProperty = entityEntryType.GetProperty("State");
+                
+                generator.Emit(OpCodes.Call, stateProperty.GetGetMethod());
+                generator.Emit(OpCodes.Stloc, localState);
+            
+                generator.Emit(OpCodes.Ldloc, localState);
+            
+                generator.Emit(OpCodes.Ldc_I4, (int)EntityState.Detached);
+
+                generator.Emit(OpCodes.Ceq);
+                generator.Emit( OpCodes.Brfalse, label );
+            
+                var ctor = typeof (EntityStateValidationException).GetConstructor(Type.EmptyTypes);
+                generator.Emit(OpCodes.Newobj, ctor);
+                generator.Emit(OpCodes.Throw);
+            
+            generator.BeginCatchBlock( typeof( InvalidOperationException ));            
+            generator.EndExceptionBlock();
+            
+            generator.MarkLabel(label);            
         }
 
         void DefineCopyItemAdapterMethod<T>(TypeBuilder typeBuilder, FieldBuilder fieldBuilder, EntityType entityMetadata)
@@ -240,6 +325,9 @@ namespace CodeOwls.EntityProvider.Adapters
             var attributeBuilder = BuildParameterAttribute(propertyInfo, entityMetadata);
             propertyBuilder.SetCustomAttribute(attributeBuilder);
 
+            attributeBuilder = BuildValidationAttribute(propertyInfo);
+            propertyBuilder.SetCustomAttribute(attributeBuilder);
+
             attributeBuilder = BuildAliasAttribute(alias);
             propertyBuilder.SetCustomAttribute( attributeBuilder );
 
@@ -280,6 +368,17 @@ namespace CodeOwls.EntityProvider.Adapters
             return new CustomAttributeBuilder(
                 typeof(AliasAttribute).GetConstructor( new []{typeof(string[])}), 
                 new[]{new[]{alias}});
+        }
+
+        private CustomAttributeBuilder BuildValidationAttribute(PropertyInfo propertyInfo)
+        {
+            var paramType = typeof (ValidateEntityStateAttribute);
+            var builder = new CustomAttributeBuilder(
+                paramType.GetConstructor(Type.EmptyTypes),
+                new object[] {}
+                );
+
+            return builder;
         }
 
         private CustomAttributeBuilder BuildParameterAttribute(PropertyInfo propertyInfo, EntityType entityMetadata )
@@ -370,7 +469,7 @@ namespace CodeOwls.EntityProvider.Adapters
             }
             var filePath = _assemblyBuilder.GetName().Name + ".dll";
             _assemblyBuilder.Save( filePath );
-            return _assemblyBuilder.Location;
+            return filePath;
         }
 
     }

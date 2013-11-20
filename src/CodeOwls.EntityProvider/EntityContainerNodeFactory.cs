@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Data.Entity;
-using System.Data.Metadata.Edm;
-using System.Data.Objects;
 using System.Linq;
 using System.Management.Automation;
 using CodeOwls.PowerShell.Provider.PathNodeProcessors;
@@ -73,7 +71,8 @@ namespace CodeOwls.EntityProvider
         public IPathNode NewItem(IContext context, string path, string itemTypeName, object newItemValue)
         {
             var adapter = context.DynamicParameters as IEntityAdapter<T>;
-            var newEntity = adapter.ToNewEntity();
+            
+            var newEntity = adapter.ToNewEntity( _drive.CurrentUnitOfWork );
             var newItem = _dbset.Add(newEntity);
 
             return new LeafPathNode( newItem, string.Empty);

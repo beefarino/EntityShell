@@ -74,7 +74,7 @@ FormatsToProcess = @()
 NestedModules = @(
     'bin/CodeOwls.PowerShell.Paths.dll',
     'bin/CodeOwls.PowerShell.Provider.dll',
-    'bin/postsharp.dll',
+
     'bin/EntityFramework.dll'
 )
 

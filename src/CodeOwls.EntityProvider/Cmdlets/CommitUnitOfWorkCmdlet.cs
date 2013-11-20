@@ -19,7 +19,7 @@ namespace CodeOwls.EntityProvider.Cmdlets
             {
                 return;
             }
-            
+
             Context.CommitCurrentUnitOfWork();            
         }
     }

@@ -66,7 +66,7 @@ namespace CodeOwls.EntityProvider
         public void RemoveItem(IContext context, string path, bool recurse)
         {
             _dbSet.Remove(_entity);
-        }
+         }
 
         private static object _entitySetItemParameters;
         public object SetItemParameters

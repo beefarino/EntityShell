@@ -36,7 +36,8 @@ namespace CodeOwls.EntityProvider
 
         protected override DbContext CreateUnitOfWork()
         {
-            return Activator.CreateInstance(_dbContextType) as DbContext;
+            var context = Activator.CreateInstance(_dbContextType);
+            return context as DbContext;
         }
     }
 }
