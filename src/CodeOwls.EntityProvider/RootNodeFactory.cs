@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Metadata.Edm;
 using System.Linq;
 using System.Reflection;
+using CodeOwls.EntityProvider.Attributes;
 using CodeOwls.PowerShell.Provider.PathNodes;
 
 namespace CodeOwls.EntityProvider
@@ -41,65 +42,13 @@ namespace CodeOwls.EntityProvider
 
         private INodeFactory CreateNodeFactoryForEntity(EntityType entity)
         {
-            var type = FindQualifiedTypeForEntity(entity);
+            var type = MetadataHelpers.FindQualifiedTypeForEntity(entity);
 
             var factory = CreateClosedGenericNodeFactory(type);
             return factory;
         }
 
-        private Type FindQualifiedTypeForEntity(EntityType entity)
-        {
-            var qname = QualifyEntityTypeName(entity);
-            var type = FindType(qname);
-            return type;
-        }
-
-        readonly IDictionary<string,string> _assemblyNames = new Dictionary<string, string>(); 
-        private string QualifyEntityTypeName(EntityType entity)
-        {
-            var assemblyName = GetAssemblyNameFromEntity(entity);
-
-            return entity.FullName +", " + assemblyName;
-        }
-
-        private string GetAssemblyNameFromEntity(EntityType entity)
-        {
-            var name = entity.FullName;
-            string assemblyName = null;
-
-            if (! _assemblyNames.TryGetValue(name, out assemblyName))
-            {
-                assemblyName = LoadEntityTypeAssemblyName(entity);
-                _assemblyNames[name] = assemblyName;
-            }
-            return assemblyName;
-        }
-
-        private string LoadEntityTypeAssemblyName(EntityType entity)
-        {
-            var pi = typeof (EntityType).GetProperty("ClrType", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (null == pi)
-            {
-                throw new InvalidOperationException(
-                    "the entity metadata does not support an internal ClrType property as expected");
-            }
-
-            var type = pi.GetValue(entity) as Type;
-            if (null == type)
-            {
-                throw new InvalidOperationException("failed to obtain a valid entity type reference from the specified entity metadata");
-            }
-
-            var assemblyName = new AssemblyName(type.Assembly.FullName).Name;
-            
-            return assemblyName;
-        }
-
-        private Type FindType(string fullName)
-        {
-            return Type.GetType(fullName);
-        }
-
+        
 
         INodeFactory CreateClosedGenericNodeFactory(Type genericParameterType)
         {

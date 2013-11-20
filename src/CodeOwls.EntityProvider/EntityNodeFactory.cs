@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Management.Automation;
+using CodeOwls.EntityProvider.Attributes;
 using CodeOwls.PowerShell.Provider.PathNodeProcessors;
 using CodeOwls.PowerShell.Provider.PathNodes;
 using CodeOwls.EntityProvider.Adapters;
@@ -75,7 +76,10 @@ namespace CodeOwls.EntityProvider
             {
                 if (null == _entitySetItemParameters)
                 {
-                    var adapter = new EntityRuntimeParameterAdapter();
+                    var pocoTypes =
+                        _drive.GetPOCOs().ToList().ConvertAll(MetadataHelpers.FindQualifiedTypeForEntity);
+                    
+                    var adapter = new EntityRuntimeParameterAdapter(pocoTypes);
                     var entityMetadata = _drive.GetEntityMetadata<T>();
                     _entitySetItemParameters = adapter.AsSetItemRuntimeParameter(new T(), entityMetadata);
                 }

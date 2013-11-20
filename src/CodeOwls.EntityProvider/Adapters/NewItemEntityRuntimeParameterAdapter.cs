@@ -60,9 +60,11 @@ namespace CodeOwls.EntityProvider.Adapters
         private static string _rootNamespace;
         private static readonly Version DynamicAssemblyVersion = new Version(1, 1, 0, 0);
         private bool _specifyMandatoryParameters;
+        private readonly List<Type> _pocoTypes;
 
-        public EntityRuntimeParameterAdapter()
+        public EntityRuntimeParameterAdapter(List<Type> pocoTypes)
         {
+            _pocoTypes = pocoTypes;
             _specifyMandatoryParameters = true;
         }
 
@@ -72,7 +74,6 @@ namespace CodeOwls.EntityProvider.Adapters
             {
                 return null;
             }
-
             _specifyMandatoryParameters = true;
             return AsRuntimeParameter(entity, entityMetadata, "New");
         }
@@ -204,7 +205,7 @@ namespace CodeOwls.EntityProvider.Adapters
                              where p.CanRead && p.CanWrite
                              select p;
 
-            foreach (var propertyInfo in properties)
+            foreach (var propertyInfo in properties.Where( pi=> _pocoTypes.Contains(pi.PropertyType)))
             {
                 DefineVerifyEntityStateIL(generator, entityCopy, propertyInfo, fieldBuilder);
             }
@@ -254,7 +255,10 @@ namespace CodeOwls.EntityProvider.Adapters
                 generator.Emit(OpCodes.Ceq);
                 generator.Emit( OpCodes.Brfalse, label );
             
-                var ctor = typeof (EntityStateValidationException).GetConstructor(Type.EmptyTypes);
+                var ctor = typeof (EntityStateValidationException).GetConstructor(new[]{typeof(string)});
+                generator.Emit( OpCodes.Ldstr, String.Format(
+                    "The specified entity of type {0} is in a detached state and cannot be used for this operation",
+                    propertyInfo.PropertyType.FullName));
                 generator.Emit(OpCodes.Newobj, ctor);
                 generator.Emit(OpCodes.Throw);
             
