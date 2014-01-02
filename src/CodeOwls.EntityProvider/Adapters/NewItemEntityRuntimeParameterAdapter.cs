@@ -9,7 +9,6 @@ using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using CodeOwls.EntityProvider.Attributes;
@@ -24,34 +23,6 @@ namespace CodeOwls.EntityProvider.Adapters
         void CopyTo(T entity);
     }
 
-    [Serializable]
-    public class EntityStateValidationException : Exception
-    {
-        //
-        // For guidelines regarding the creation of new exception types, see
-        //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconerrorraisinghandlingguidelines.asp
-        // and
-        //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dncscol/html/csharp07192001.asp
-        //
-
-        public EntityStateValidationException()
-        {
-        }
-
-        public EntityStateValidationException(string message) : base(message)
-        {
-        }
-
-        public EntityStateValidationException(string message, Exception inner) : base(message, inner)
-        {
-        }
-
-        protected EntityStateValidationException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-        }
-    }
     class EntityRuntimeParameterAdapter
     {
         private static AssemblyBuilder _assemblyBuilder;
@@ -329,11 +300,14 @@ namespace CodeOwls.EntityProvider.Adapters
             var attributeBuilder = BuildParameterAttribute(propertyInfo, entityMetadata);
             propertyBuilder.SetCustomAttribute(attributeBuilder);
 
-            attributeBuilder = BuildValidationAttribute(propertyInfo);
-            propertyBuilder.SetCustomAttribute(attributeBuilder);
-
             attributeBuilder = BuildAliasAttribute(alias);
             propertyBuilder.SetCustomAttribute( attributeBuilder );
+
+            if (_pocoTypes.Contains(propertyInfo.PropertyType))
+            {
+                attributeBuilder = BuildPathTransformAttribute(propertyInfo);
+                propertyBuilder.SetCustomAttribute(attributeBuilder);
+            }
 
             const MethodAttributes methodAttributes = MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Public;
 
@@ -374,9 +348,9 @@ namespace CodeOwls.EntityProvider.Adapters
                 new[]{new[]{alias}});
         }
 
-        private CustomAttributeBuilder BuildValidationAttribute(PropertyInfo propertyInfo)
+        private CustomAttributeBuilder BuildPathTransformAttribute(PropertyInfo propertyInfo)
         {
-            var paramType = typeof (ValidateEntityStateAttribute);
+            var paramType = typeof (EntityFromPathArgumentTransformAttribute);
             var builder = new CustomAttributeBuilder(
                 paramType.GetConstructor(Type.EmptyTypes),
                 new object[] {}

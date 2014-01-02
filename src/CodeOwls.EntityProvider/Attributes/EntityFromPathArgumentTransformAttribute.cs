@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Management.Automation;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeOwls.EntityProvider.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class EntityDriveFromPathArgumentTransformAttribute : ArgumentTransformationAttribute
+    public class EntityFromPathArgumentTransformAttribute : ArgumentTransformationAttribute
     {
         public override object Transform(EngineIntrinsics engineIntrinsics, object inputData)
         {
-            if (null == inputData)
+            if (null == inputData || typeof(string) != inputData.GetType())
             {
-                inputData = ".";
+                return inputData;
             }
 
             var path = inputData.ToString();
 
-            var drive = MetadataHelpers.GetEntityDriveFromPSPath(engineIntrinsics.SessionState.Path, path);
+            var entity = MetadataHelpers.GetEntityFromPSPath(engineIntrinsics, path);
 
-            return drive;
+            return entity ?? inputData;
         }
     }
 }

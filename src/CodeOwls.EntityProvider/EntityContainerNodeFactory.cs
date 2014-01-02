@@ -59,7 +59,9 @@ namespace CodeOwls.EntityProvider
 
         public override IPathNode GetNodeValue()
         {
-            return new ContainerPathNode( this, Name );
+            var name = Name;
+            var value= new EntityContainer(_drive, name);
+            return new ContainerPathNode( value, name);
         }
 
         public override string Name
@@ -96,6 +98,28 @@ namespace CodeOwls.EntityProvider
 
                 return _entityNewItemParameters;
             }
+        }
+    }
+
+    public class EntityContainer
+    {
+        private readonly EntityDrive _drive;
+        private readonly string _name;
+
+        public EntityContainer(EntityDrive drive, string name)
+        {
+            _drive = drive;
+            _name = name;
+        }
+
+        public string Name
+        {
+            get { return _name; }
+        }
+
+        public EntityDrive Drive
+        {
+            get { return _drive; }
         }
     }
 

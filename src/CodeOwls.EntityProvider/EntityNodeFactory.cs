@@ -53,14 +53,14 @@ namespace CodeOwls.EntityProvider
 
         public override string Name
         {
-            get { return GetName(); }
+            get { return GetName(_entity); }
         }
 
-        string GetName()
+        internal static string GetName( T entity )
         {
             var type = typeof (T);
             var propertyName = KeyMap[type];
-            return type.GetProperty(propertyName).GetValue(_entity).ToString();
+            return type.GetProperty(propertyName).GetValue(entity).ToString();
         }
 
         public object RemoveItemParameters { get { return null; } }
