@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Metadata.Edm;
+//using System.Data.Metadata.Edm;
 using System.Linq;
 using System.Reflection;
 using CodeOwls.EntityProvider.Attributes;
 using CodeOwls.PowerShell.Provider.PathNodes;
+using System.Data.Entity.Core.Metadata.Edm;
 
 namespace CodeOwls.EntityProvider
 {

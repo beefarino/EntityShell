@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Data.Metadata.Edm;
 using System.Globalization;
 using System.Linq;
 using System.Management.Automation;
@@ -13,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CodeOwls.EntityProvider.Attributes;
 using PropertyAttributes = System.Reflection.PropertyAttributes;
+using System.Data.Entity.Core.Metadata.Edm;
 
 namespace CodeOwls.EntityProvider.Adapters
 {
@@ -192,7 +192,7 @@ namespace CodeOwls.EntityProvider.Adapters
         {       
             var contextType = typeof (DbContext);
             var entityEntryType = typeof (DbEntityEntry);
-            var entityStateType = typeof (EntityState);
+            var entityStateType = typeof (System.Data.Entity.EntityState);
             var label = generator.DefineLabel();
             
             var methodInfo = contextType.GetMethod("Entry", BindingFlags.Instance | BindingFlags.Public, null, new[]{typeof(object)}, null);
@@ -221,7 +221,7 @@ namespace CodeOwls.EntityProvider.Adapters
             
                 generator.Emit(OpCodes.Ldloc, localState);
             
-                generator.Emit(OpCodes.Ldc_I4, (int)EntityState.Detached);
+                generator.Emit(OpCodes.Ldc_I4, (int)System.Data.Entity.EntityState.Detached);
 
                 generator.Emit(OpCodes.Ceq);
                 generator.Emit( OpCodes.Brfalse, label );
