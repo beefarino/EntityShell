@@ -2,12 +2,13 @@
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Data.Metadata.Edm;
-using System.Data.Objects;
+
 using System.Linq;
 using System.Management.Automation;
 using System.Text.RegularExpressions;
 using CodeOwls.PowerShell.Provider;
+using System.Data.Entity.Core.Metadata.Edm;
+using System.Data.Entity.Core.Objects;
 
 namespace CodeOwls.EntityProvider
 {
@@ -46,12 +47,12 @@ namespace CodeOwls.EntityProvider
             get { return null != _currentUnitOfWork; }
         }
 
-        public EntityState GetEntityState(PSObject entity)
+        public System.Data.Entity.EntityState GetEntityState(PSObject entity)
         {
             return GetEntityState(entity.BaseObject);
         }
 
-        public EntityState GetEntityState(object entity)
+        public System.Data.Entity.EntityState GetEntityState(object entity)
         {
             return CurrentUnitOfWork.Entry(entity).State;
         }
